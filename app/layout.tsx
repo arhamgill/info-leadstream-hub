@@ -16,9 +16,6 @@ export const metadata: Metadata = {
   title: "LeadStream Hub - Insurance Leads",
   description:
     "Exclusive, compliant insurance leads built for licensed agents and agencies. 100% Social Media Generated, Phone-Verified, TCPA-Compliant leads.",
-  icons: {
-    icon: "/logo.png",
-  },
 };
 
 export default function RootLayout({
@@ -29,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/png" href="/logo.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body
