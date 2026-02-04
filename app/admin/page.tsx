@@ -7,24 +7,36 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    // Simple client-side check (you can enhance this with API route)
-    if (
-      email === process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
-      email === "admin@leadstreamhub.com"
-    ) {
-      if (password === "12345678") {
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
         sessionStorage.setItem("adminLoggedIn", "true");
         router.push("/admin/dashboard");
       } else {
-        setError("Invalid password");
+        setError(data.error || "Invalid credentials");
       }
-    } else {
-      setError("Invalid email");
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,9 +82,10 @@ export default function AdminLogin() {
 
           <button
             type="submit"
-            className="w-full bg-[#00d4ff] text-[#0a0f1a] py-3 rounded-lg font-semibold text-base hover:bg-[#00b8e6] transition-colors mt-6"
+            disabled={loading}
+            className="w-full bg-[#00d4ff] text-[#0a0f1a] py-3 rounded-lg font-semibold text-base hover:bg-[#00b8e6] transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
