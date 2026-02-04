@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Shield, Phone, Users, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [reviews, setReviews] = useState<{ id: string; url: string }[]>([]);
   const [formData, setFormData] = useState({
     markets: [] as string[],
     agentType: "",
@@ -28,27 +31,28 @@ export default function Home() {
     "Mortgage Protection",
   ];
 
-  const reviewImages = [
-    "/reviews/next js website 1.png",
-    "/reviews/next js website 2.png",
-    "/reviews/Screenshot (23).png",
-    "/reviews/Screenshot (24).png",
-    "/reviews/Screenshot (25).png",
-    "/reviews/Screenshot (27).png",
-    "/reviews/Screenshot (29).png",
-    "/reviews/Screenshot (30).png",
-    "/reviews/Screenshot (31).png",
-    "/reviews/Screenshot (32).png",
-    "/reviews/Screenshot (33).png",
-    "/reviews/Screenshot (34).png",
-  ];
-
   const trustPoints = [
     { icon: Users, text: "100% Social Media Generated" },
     { icon: Phone, text: "Phone-Verified Leads" },
     { icon: Shield, text: "TCPA-Compliant" },
     { icon: CheckCircle2, text: "Built for Licensed Agents" },
   ];
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch("/api/reviews");
+        const data = await response.json();
+        if (data.success) {
+          setReviews(data.reviews);
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+
+    fetchReviews();
+  }, []);
 
   const scrollToForm = () => {
     document
@@ -73,16 +77,39 @@ export default function Home() {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add your submission logic here
+    setSubmitting(true);
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccess(true);
+        // Keep success message visible - don't reset
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Failed to submit. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0f1a] text-[#ededed]">
+    <main className="min-h-screen bg-gradient-to-br from-[#0d1424] via-[#0f1a2e] to-[#091220] text-[#ededed] overflow-x-hidden">
       {/* Logo */}
-      <div className="flex justify-center pt-6 pb-8">
+      <div className="flex justify-center pt-6 pb-8 px-4">
         <Image
           src="/logo.png"
           alt="Logo"
@@ -93,11 +120,14 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <div id="form-section" className="container mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-2 gap-10 items-start max-w-6xl mx-auto">
+      <div
+        id="form-section"
+        className="container mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 py-8 max-w-full"
+      >
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-start max-w-5xl mx-auto">
           {/* Left Side - Title */}
           <div className="space-y-6">
-            <h1 className="text-3xl lg:text-4xl leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl leading-tight break-words">
               Close More Deals with Social-Generated,{" "}
               <span className="text-[#00d4ff]">Phone-Verified</span> Insurance
               Leads
@@ -131,7 +161,7 @@ export default function Home() {
           </div>
 
           {/* Right Side - Multi-Step Form */}
-          <div className="bg-[#0f172a] rounded-xl p-6 shadow-2xl border border-gray-800">
+          <div className="bg-[#0f172a] rounded-xl p-4 sm:p-6 shadow-2xl border border-gray-800 w-full max-w-full">
             {/* Progress Indicator */}
             <div className="flex justify-between mb-6">
               {[1, 2, 3, 4].map((step) => (
@@ -157,8 +187,33 @@ export default function Home() {
             </div>
 
             <form onSubmit={handleSubmit}>
+              {/* Success Message */}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center space-y-4 py-8"
+                >
+                  <div className="mx-auto w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-10 h-10 text-green-500" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">Thank You!</h2>
+                  <p className="text-gray-300 text-sm max-w-md mx-auto">
+                    Your information has been received. Our team will review
+                    your details and reach out to you within 24 hours to discuss
+                    exclusive lead opportunities tailored to your markets.
+                  </p>
+                  <div className="pt-4">
+                    <div className="inline-flex items-center space-x-2 text-[#00d4ff] text-sm">
+                      <Phone className="w-4 h-4" />
+                      <span>Expect a call from our team soon!</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Step 1: Markets Served */}
-              {currentStep === 1 && (
+              {!success && currentStep === 1 && (
                 <div className="space-y-4">
                   <h2 className="text-xl font-bold text-center mb-4">
                     Markets Served
@@ -193,7 +248,7 @@ export default function Home() {
               )}
 
               {/* Step 2: Agent Type */}
-              {currentStep === 2 && (
+              {!success && currentStep === 2 && (
                 <div className="space-y-4">
                   <h2 className="text-xl font-bold text-center mb-4">
                     Agent Type
@@ -387,7 +442,7 @@ export default function Home() {
               )}
 
               {/* Step 4: Consent */}
-              {currentStep === 4 && (
+              {!success && currentStep === 4 && (
                 <div className="space-y-4">
                   <h2 className="text-xl font-bold text-center mb-4">
                     Review & Consent
@@ -445,10 +500,10 @@ export default function Home() {
                     </button>
                     <button
                       type="submit"
-                      disabled={!formData.consent}
+                      disabled={!formData.consent || submitting}
                       className="flex-1 bg-[#00d4ff] text-[#0a0f1a] py-3 rounded-lg font-semibold text-sm hover:bg-[#00b8e6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Submit & Get Contacted
+                      {submitting ? "Submitting..." : "Submit & Get Contacted"}
                     </button>
                   </div>
                 </div>
@@ -459,40 +514,46 @@ export default function Home() {
       </div>
 
       {/* Reviews Section */}
-      <div className="container mx-auto px-6 py-16">
-        <h2 className="text-3xl lg:text-4xl text-center mb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 py-16 max-w-full">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl text-center mb-12 break-words">
           What other agents are saying
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-7xl mx-auto">
-          {reviewImages.map((image, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.1,
-                ease: "easeOut",
-              }}
-              className="relative overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
-            >
-              <Image
-                src={image}
-                alt={`Review ${index + 1}`}
-                width={400}
-                height={300}
-                className="w-full h-auto"
-              />
-            </motion.div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+          {reviews.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-gray-400">
+              No reviews available yet
+            </div>
+          ) : (
+            reviews.map((review, index) => (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                  ease: "easeOut",
+                }}
+                className="relative overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              >
+                <Image
+                  src={review.url}
+                  alt={`Review ${index + 1}`}
+                  width={400}
+                  height={400}
+                  className="w-full h-auto"
+                />
+              </motion.div>
+            ))
+          )}
         </div>
       </div>
 
       {/* Footer */}
       <footer className="py-8 border-t border-gray-800">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6 max-w-full">
           <p className="text-center text-xs text-gray-400">
             © {new Date().getFullYear()} Lead Stream Hub. All rights reserved.
           </p>
