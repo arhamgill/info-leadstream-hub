@@ -161,7 +161,7 @@ export default function Home() {
           </div>
 
           {/* Right Side - Multi-Step Form */}
-          <div className="bg-gradient-to-br from-[#1a1f35] to-[#0f1524] rounded-2xl p-4 sm:p-6 shadow-[0_0_50px_rgba(0,212,255,0.15)] border-2 border-[#00d4ff]/30 w-full max-w-full backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-[#1e2740] to-[#151d30] rounded-2xl p-4 sm:p-6 shadow-[0_0_50px_rgba(0,212,255,0.15)] border-2 border-[#00d4ff]/30 w-full max-w-full backdrop-blur-sm">
             {/* Progress Indicator */}
             <div className="flex justify-between mb-6">
               {[1, 2, 3, 4].map((step) => (
