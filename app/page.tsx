@@ -22,13 +22,13 @@ export default function Home() {
   });
 
   const markets = [
-    "Final Expense",
-    "Medicare Advantage",
-    "Medicare Supplement",
-    "Turning 65 (T-65)",
-    "ACA / Marketplace Health",
     "Auto Insurance",
+    "Medicare Supplement",
+    "Final Expense",
     "Mortgage Protection",
+    "ACA / Marketplace Health",
+    "Turning 65 (T-65)",
+    "Medicare Advantage",
   ];
 
   const trustPoints = [
@@ -107,15 +107,15 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0d1424] via-[#0f1a2e] to-[#091220] text-[#ededed] overflow-x-hidden">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-[#ededed] overflow-x-hidden">
       {/* Logo */}
-      <div className="flex justify-center pt-6 pb-8 px-4">
+      <div className="flex justify-center top-0">
         <Image
           src="/logo.png"
           alt="Logo"
-          width={120}
+          width={200}
           height={36}
-          className="object-contain"
+          className=""
         />
       </div>
 
@@ -127,7 +127,7 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-start max-w-5xl mx-auto">
           {/* Left Side - Title */}
           <div className="space-y-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl leading-tight break-words">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight break-words">
               Close More Deals with Social-Generated,{" "}
               <span className="text-[#00d4ff]">Phone-Verified</span> Insurance
               Leads
@@ -138,7 +138,7 @@ export default function Home() {
             </p>
 
             {/* Trust Points */}
-            <div className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-4 pt-4">
               {trustPoints.map((point, index) => {
                 const Icon = point.icon;
                 return (
@@ -150,35 +150,37 @@ export default function Home() {
               })}
             </div>
 
-            {/* CTA Link */}
-            <div
+            {/* CTA Button */}
+            <button
               onClick={scrollToForm}
-              className="mt-6 flex items-center space-x-2 text-[#00d4ff] hover:text-[#00b8e6] transition-colors cursor-pointer"
+              className="mt-6 bg-[#00d4ff] text-[#0a0f1a] px-6 py-3 rounded-full font-semibold text-base hover:bg-[#00b8e6] transition-colors flex items-center space-x-2 w-fit"
             >
+              <span>Get Started Now</span>
               <ArrowRight className="w-5 h-5" />
-              <span className="text-base font-medium">Get Started Now</span>
-            </div>
+            </button>
           </div>
 
           {/* Right Side - Multi-Step Form */}
-          <div className="bg-[#0f172a] rounded-xl p-4 sm:p-6 shadow-2xl border border-gray-800 w-full max-w-full">
+          <div className="bg-gradient-to-br from-[#1a1f35] to-[#0f1524] rounded-2xl p-4 sm:p-6 shadow-[0_0_50px_rgba(0,212,255,0.15)] border-2 border-[#00d4ff]/30 w-full max-w-full backdrop-blur-sm">
             {/* Progress Indicator */}
             <div className="flex justify-between mb-6">
               {[1, 2, 3, 4].map((step) => (
                 <div key={step} className="flex items-center flex-1">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-lg ${
                       currentStep >= step
-                        ? "bg-[#00d4ff] text-[#0a0f1a]"
-                        : "bg-gray-700 text-gray-400"
+                        ? "bg-gradient-to-br from-[#00d4ff] to-[#00b8e6] text-[#0a0f1a]"
+                        : "bg-gray-700/50 text-gray-400 border border-gray-600"
                     }`}
                   >
                     {step}
                   </div>
                   {step < 4 && (
                     <div
-                      className={`flex-1 h-1 mx-2 ${
-                        currentStep > step ? "bg-[#00d4ff]" : "bg-gray-700"
+                      className={`flex-1 h-1.5 mx-2 rounded-full ${
+                        currentStep > step
+                          ? "bg-gradient-to-r from-[#00d4ff] to-[#00b8e6]"
+                          : "bg-gray-700/50"
                       }`}
                     />
                   )}
@@ -516,7 +518,7 @@ export default function Home() {
       {/* Reviews Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 py-16 max-w-full">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl text-center mb-12 break-words">
-          What other agents are saying
+          Reviews From Clients
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
